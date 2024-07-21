@@ -1,6 +1,10 @@
 --[[
     The Skydeep Cenote Dungeon Waypoints
     v1.0
+
+    The teleporter for the final boss can sometimes mess up with the pathing. 
+    Occasionally you might run off the boss platform, 
+    or run miss the teleporter and just run into the walls.
 ]]
 
 local zoneId = 1194

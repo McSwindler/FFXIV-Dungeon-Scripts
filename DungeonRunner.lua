@@ -1,6 +1,5 @@
 --[[
   Fully working Script for Auto Dungeons (tested with Trust NPCs)
-  v1.0
 
   Requires: 
     - BossMod Reborn
@@ -80,6 +79,7 @@ function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
     DungeonRunner.Startup()
 
     local hasPathed = false
+    local i = 0
     while DungeonRunner.currentWaypointIndex <= #waypoints do
         if not IsInZone(zoneId) then
             yield("/echo Not in Zone, stopping")
@@ -93,13 +93,18 @@ function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
         DungeonRunner.CheckDeath()
 
         local waypoint = waypoints[DungeonRunner.currentWaypointIndex]
+
+        --hack to allow exiting script at any point
+        yield("/wait 0.1")
         
+--[[
         LogDebug("[DungeonRunner] Current Waypoint: " .. tostring(waypoint.x) .. "," .. tostring(waypoint.y) .. "," .. tostring(waypoint.z) .. 
             " Combat: " .. tostring(GetCharacterCondition(26)) .. 
             " Occupied: " .. tostring(IsPlayerOccupied()) .. 
             " HasPathed: " .. tostring(hasPathed) ..
             " PathfindInProgress: " .. tostring(PathfindInProgress()) ..
             " PathIsRunning: " .. tostring(PathIsRunning()))
+]]
 
         -- Check for combat condition
         if GetCharacterCondition(26) then
@@ -135,17 +140,16 @@ function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
                     LogInfo("[DungeonRunner] Continuing to next waypoint " .. tostring(DungeonRunner.currentWaypointIndex + 1))
                     DungeonRunner.currentWaypointIndex = DungeonRunner.currentWaypointIndex + 1
                     hasPathed = false
-                else
+                elseif i % 10 == 0 then
                     LogDebug("[DungeonRunner] Moving to " .. tostring(waypoint.x) .. "," .. tostring(waypoint.y) .. "," .. tostring(waypoint.z))
                     PathfindAndMoveTo(waypoint.x, waypoint.y, waypoint.z)
-                    yield("/wait 1")
                     hasPathed = true
                 end
             end
-
             
             
         end
+        i = i + 1
 
     end
 

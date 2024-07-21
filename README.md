@@ -8,7 +8,7 @@ A lot of the heavy lifting is done by additional plugins: BossMod, Rotation Solv
 
 It's a relatively simple script that basically moves you to a waypoint. It will wait for combat to complete before continuing movement. Chest waypoints are provided so you can loot all the things (if you enable Pandora's Box).
 
-Pathing is handled by vnavmesh, Combat is handled by Rotation Solver, and BossMod AI keeps you alive.
+Pathing is handled by vnavmesh, Combat is handled by Rotation Solver, and BossMod AI keeps you alive. Plugins are toggled on automatically when running a dungeon script. BossMod AI and Rotation Solver are disabled automatically when the dungeon is finished.
 
 ## Setup
 
@@ -114,3 +114,7 @@ DungeonRunner = require("DungeonRunner")
 DungeonRunner.currentWaypointIndex = 5 -- run from the 5th waypoint
 DungeonRunner.ExecuteDungeon(zoneId, waypoints)
 ```
+
+### TODO
+
+- Make death recovery better, utilize the shortcut and checkpoints when available.
