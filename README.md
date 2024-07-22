@@ -118,3 +118,4 @@ DungeonRunner.ExecuteDungeon(zoneId, waypoints)
 ### TODO
 
 - Make death recovery better, utilize the shortcut and checkpoints when available.
+- Loop the dungeon?

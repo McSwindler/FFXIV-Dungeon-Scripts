@@ -1,5 +1,6 @@
 --[[
   Fully working Script for Auto Dungeons (tested with Trust NPCs)
+  v1.1
 
   Requires: 
     - BossMod Reborn
@@ -75,10 +76,20 @@ function DungeonRunner.MeshCheck()
     end
 end
 
+function DungeonRunner.IsOccupied()
+    return GetCharacterCondition(25) or -- Occupid
+        GetCharacterCondition(26) or -- InCombat
+        GetCharacterCondition(31) or -- OccupiedInEvent
+        GetCharacterCondition(32) or -- OccupiedInQuestEvent
+        GetCharacterCondition(35) or -- OccupiedInCutSceneEvent
+        GetCharacterCondition(58) -- WatchingCutscene
+end
+
 function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
     DungeonRunner.Startup()
 
     local hasPathed = false
+    local reachedDestination = false
     local i = 0
     while DungeonRunner.currentWaypointIndex <= #waypoints do
         if not IsInZone(zoneId) then
@@ -121,7 +132,7 @@ function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
             -- Waypoint navigation
             
             local distanceToWaypoint = GetDistanceToPoint(waypoint.x, waypoint.y, waypoint.z)
-            if distanceToWaypoint <= 1.5 then
+            if distanceToWaypoint <= 1.5 and not reachedDestination then
                 if waypoint.wait then
                     yield("/wait " .. waypoint.wait)
                 end
@@ -132,14 +143,18 @@ function DungeonRunner.ExecuteDungeon(zoneId, waypoints)
                     yield("/target " .. waypoint.interact)
                     yield("/wait 0.1")
                     yield("/interact")
+                    yield("/wait 2")
                 end
+                LogInfo("[DungeonRunner] Reached Destination " .. string.format("%.2f", GetPlayerRawXPos()) .. ", " .. string.format("%.2f", GetPlayerRawYPos()) .. ", " .. string.format("%.2f", GetPlayerRawZPos()))
+                reachedDestination = true
             end
-            if not IsPlayerOccupied() then
+            if not DungeonRunner.IsOccupied() then
                 -- if the path finished, and we're not busy, assume we can move to the next waypoint
-                if hasPathed and not PathfindInProgress() and not PathIsRunning() and not GetCharacterCondition(26) then
+                if hasPathed and reachedDestination and not PathfindInProgress() and not PathIsRunning() and not GetCharacterCondition(26) then
                     LogInfo("[DungeonRunner] Continuing to next waypoint " .. tostring(DungeonRunner.currentWaypointIndex + 1))
                     DungeonRunner.currentWaypointIndex = DungeonRunner.currentWaypointIndex + 1
                     hasPathed = false
+                    reachedDestination = false
                 elseif i % 10 == 0 then
                     LogDebug("[DungeonRunner] Moving to " .. tostring(waypoint.x) .. "," .. tostring(waypoint.y) .. "," .. tostring(waypoint.z))
                     PathfindAndMoveTo(waypoint.x, waypoint.y, waypoint.z)
